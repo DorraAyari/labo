@@ -2,17 +2,19 @@ const mongoose = require('mongoose');
 
 const calendrierSchema = mongoose.Schema(
   {
-    reservationId: {
-      type: String,
-      required: true,
-      unique: true
-    },
-    articleId: {
-      type: String,
+    reservation: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Reservation',
       required: true
     },
-    userId: {
-      type: String,
+    material: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Material',
+      required: true
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true
     },
     startDateTime: {

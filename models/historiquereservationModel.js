@@ -19,11 +19,17 @@ const historiquereservationSchema = mongoose.Schema(
       type: Date,
       required: true
     },
+    reservation: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Reservation',
+        required: true
+      },
     endDateTime: {
       type: Date,
       required: true
     }
   },
+
   {
     timestamps: true
   }

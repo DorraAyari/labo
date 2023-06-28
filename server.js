@@ -1,53 +1,38 @@
-const express = require('express')
-const mongoose = require('mongoose');
-const User = require('./models/userModel')
+const express = require("express");
+const mongoose = require("mongoose");
+const userRouter = require("./api/User");
+const userCrud = require("./api/UserCrud");
+const laboRouter = require("./api/Labo");
+const reservationRouter = require("./api/Reservation");
 
-const app = express()
-app.use(express.json())
- //routes
-app.get('/',  (req,res) => {
-    res.send('Hello Node api')
-})
+const app = express();
 
-app.get('/labo',  (req,res) => {
-    res.send('Hello labo')
-})
-app.get('/user', async(req, res) => {
-    try {
-        const users = await User.find({});
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-})
-app.post('/user', async(req, res) => {
-    try {
-        const user = await User.create(req.body)
-        res.status(200).json(user);
-        
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({message: error.message})
-    }
-})
-app.get('/user/:id', async(req, res) =>{
-    try {
-        const {id} = req.params;
-        const user = await User.findById(id);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-})
-app.listen(8000, ()=> {
-    console.log('Node Api is running on port 3000')
-})
-mongoose.set("strictQuery",false)
-mongoose.
-connect('mongodb+srv://labo:root@cluster0.pqbr7eg.mongodb.net/Node=API?retryWrites=true&w=majority')
-.then( () => {
-    console.log('connect to database')
+app.use(express.json());
+app.use("/", userRouter); 
+app.use("/user", userCrud);
+app.use("/reservation", reservationRouter);
+app.use("/labo", laboRouter);
 
-}).catch((error) => {
-         console.log('error')
-    }) 
+app.get("/", (req, res) => {
+  res.send("Hello Node API");
+});
+
+// ... Other code ...
+
+const connectToDatabase = async () => {
+  try {
+    await mongoose.connect(
+      "mongodb+srv://labo:root@cluster0.pqbr7eg.mongodb.net/Node=API?retryWrites=true&w=majority"
+    );
+    console.log("Connected to the database");
+  } catch (error) {
+    console.log("Error connecting to the database:", error);
+  }
+};
+
+connectToDatabase();
+
+app.listen(8000, () => {
+  console.log("Node API is running on port 8000");
+});
+

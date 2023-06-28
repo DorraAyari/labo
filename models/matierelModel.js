@@ -17,6 +17,15 @@ const materielSchema = mongoose.Schema(
     quantityAvailable: {
       type: Number,
       default: 0
+    },
+    labo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Labo',
+      required: true
+    },
+    stock: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Stock'
     }
   },
   {

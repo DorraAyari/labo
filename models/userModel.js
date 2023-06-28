@@ -15,11 +15,19 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true
     },
+    dateOfBirth: {
+      type: Date,
+      required: true
+    },
     role: {
       type: String,
       enum: ['responsable', 'enseignant', 'etudiant'],
       default: 'etudiant'
-    }
+    },
+    reservations: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Reservation'
+    }]
   },
   {
     timestamps: true

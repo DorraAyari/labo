@@ -7,12 +7,14 @@ const reservationSchema = mongoose.Schema(
       required: true,
       unique: true
     },
-    userId: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true
     },
-    articleId: {
-      type: String,
+    material: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Material',
       required: true
     },
     startDateTime: {
