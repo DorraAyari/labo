@@ -2,8 +2,24 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
-router.get('/', async (req, res) => {
+// Middleware to verify the JWT token
+// Middleware to verify the JWT token
+const authenticateUser = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).json({ message: 'Authorization token not provided' });
+  }
+
+  jwt.verify(token, 'your-secret-key', (err, decoded) => {
+   
+    req.user = decoded; // Set the decoded user information in the request object
+    next();
+  });
+};
+
+router.get('/', authenticateUser, async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).json(users);
@@ -12,7 +28,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const user = await User.create(req.body);
     res.status(201).json(user);
@@ -21,7 +37,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {

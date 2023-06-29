@@ -2,9 +2,26 @@ const express = require('express');
 const router = express.Router();
 const User = require('./../models/userModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+// Helper function to generate a JWT token
+const generateToken = (user) => {
+  const payload = {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+
+  const options = {
+    expiresIn: '1h', // Token expiration time
+  };
+
+  // Generate and return the token
+  return jwt.sign(payload, 'your-secret-key', options);
+};
 
 router.post('/signup', (req, res) => {
-    let { name, email, password, dateOfBirth } = req.body;
+  let { name, email, password, dateOfBirth } = req.body;
   name = name.trim();
   email = email.trim();
   password = password.trim();
@@ -52,10 +69,14 @@ router.post('/signup', (req, res) => {
               newUser
                 .save()
                 .then((result) => {
+                  const token = generateToken(result); // Generate token for the newly registered user
                   res.json({
                     status: 'SUCCESS',
                     message: 'Signup successful',
-                    data: result,
+                    data: {
+                      user: result,
+                      token: token,
+                    },
                   });
                 })
                 .catch((err) => {
@@ -82,57 +103,59 @@ router.post('/signup', (req, res) => {
       });
   }
 });
-  router.post('/signin', (req, res) => {
-    let {email, password} = req.body;
+router.post('/signin', (req, res) => {
+  let { email, password } = req.body;
   email = email.trim();
   password = password.trim();
-  if(email == "" || password == ""){
+  if (email == "" || password == "") {
     res.json({
-        status: 'FAILED',
-        message: 'Empty credentials supplied'
-      })
-  }else{
+      status: 'FAILED',
+      message: 'Empty credentials supplied'
+    })
+  } else {
     User.find({ email })
       .then(data => {
         if (data.length) {
-            const hashedPassword = data[0].password;
-            bcrypt.compare(password, hashedPassword).then(result => {
-                if(result){
-                    res.json({
-                        status: 'SUCCESS',
-                        message: 'Signin successful',
-                        data: data
-                      })
-                }
-                else{
-                    res.json({
-                        status: 'FAILED',
-                        message: 'Invalid password entered',
-                    })   
-                }
-            }).catch(err => {
-                res.json({
-                    status: 'FAILED',
-                    message: 'an error occurred while comparing passwords',
-                })      
-            
-            })
-          
-        }else{
-            res.json({
+          const hashedPassword = data[0].password;
+          bcrypt.compare(password, hashedPassword).then(result => {
+            if (result) {
+              const token = generateToken(data[0]); // Generate token for the authenticated user
+              res.json({
+                status: 'SUCCESS',
+                message: 'Signin successful',
+                data: {
+                  user: data[0],
+                  token: token,
+                },
+              })
+            }
+            else {
+              res.json({
                 status: 'FAILED',
-                message: 'Invalid credentials entered',
-            })      
-        }
-    })
-    .catch(err => {
-        res.json({
+                message: 'Invalid password entered',
+              })
+            }
+          }).catch(err => {
+            res.json({
+              status: 'FAILED',
+              message: 'An error occurred while comparing passwords',
+            })
+          })
+        } else {
+          res.json({
             status: 'FAILED',
-            message: 'an error occurred while checking for existing user',
-        })  
-    })
-}
-  
-})
+            message: 'Invalid credentials entered',
+          })
+        }
+      })
+      .catch(err => {
+        res.json({
+          status: 'FAILED',
+          message: 'An error occurred while checking for existing user',
+        })
+      })
+  }
+});
+
 
 module.exports = router;
