@@ -23,10 +23,10 @@ const materielSchema = mongoose.Schema(
       ref: 'Labo',
       required: true
     },
-    stock: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Stock'
-    }
+   // stock: {
+   //   type: mongoose.Schema.Types.ObjectId,
+  //    ref: 'Stock'
+  //  }
   },
   {
     timestamps: true
