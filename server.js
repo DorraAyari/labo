@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const userRouter = require("./api/User");
 const userCrud = require("./api/UserCrud");
 const laboRouter = require("./api/Labo");
+const materielRouter = require("./api/Materiel");
 const reservationRouter = require("./api/Reservation");
 
 const app = express();
@@ -12,7 +13,7 @@ app.use("/", userRouter);
 app.use("/user", userCrud);
 app.use("/reservation", reservationRouter);
 app.use("/labo", laboRouter);
-
+app.use("/materiel", materielRouter);
 app.get("/", (req, res) => {
   res.send("Hello Node API");
 });
