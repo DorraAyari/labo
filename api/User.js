@@ -7,10 +7,10 @@ const jwt = require('jsonwebtoken');
 // Helper function to generate a JWT token
 const generateToken = (user) => {
   const payload = {
-    id: user._id,
     name: user.name,
     email: user.email,
     role: user.role,
+    userId: user._id,
   };
 
   const options = {
@@ -20,6 +20,7 @@ const generateToken = (user) => {
   // Generate and return the token
   return jwt.sign(payload, 'your-secret-key', options);
 };
+
 
 router.post('/signup', (req, res) => {
   let { name, email, password, dateOfBirth } = req.body;
@@ -73,28 +74,37 @@ router.post('/signup', (req, res) => {
             name,
             email,
             password: hashedPassword,
-            dateOfBirth,
+            dateOfBirth
           });
 
-          newUser
-            .save()
-            .then((result) => {
-              const token = generateToken(result); // Generate token for the newly registered user
-              res.json({
-                status: 'SUCCESS',
-                message: 'Signup successful',
-                data: {
-                  user: result,
-                  token: token,
+          newUser.save()
+          .then((result) => {
+            const { _id, name, email, role } = result; // Extract the user ID from the saved result
+            const token = generateToken(result); // Generate token for the newly registered user
+            const userId = result.userId; // Access the user ID from the saved result
+        
+            res.json({
+              status: 'SUCCESS',
+              message: 'Signup successful',
+              data: {
+                user: {
+                  _id,
+                  name,
+                  userId, // Use the user ID as userId
+                  email,
+                  role,
                 },
-              });
-            })
-            .catch((err) => {
-              res.json({
-                status: 'FAILED',
-                message: 'An error occurred while saving user account',
-              });
+                token: token,
+              },
             });
+          })
+          .catch((err) => {
+            res.json({
+              status: 'FAILED',
+              message: 'An error occurred while saving user account',
+            });
+          });
+        
         })
         .catch((err) => {
           res.json({
@@ -132,6 +142,7 @@ router.post('/signin', (req, res) => {
           message: 'Invalid credentials entered',
         });
       }
+      const token = generateToken(user); // Generate token for the authenticated user
 
       const hashedPassword = user.password;
       bcrypt
@@ -144,6 +155,7 @@ router.post('/signin', (req, res) => {
               message: 'Signin successful',
               data: {
                 user: user,
+                userId: user._id, // Use the user ID as userId
                 token: token,
               },
             });
