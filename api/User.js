@@ -14,7 +14,7 @@ const generateToken = (user) => {
   };
 
   const options = {
-    expiresIn: '1h', // Token expiration time
+    expiresIn: 120, // Token expiration time
   };
 
   // Generate and return the token
@@ -113,7 +113,9 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/signin', (req, res) => {
+  
   let { email, password } = req.body;
+
   email = email.trim();
   password = password.trim();
 

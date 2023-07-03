@@ -7,13 +7,22 @@ const jwt = require('jsonwebtoken');
 
 // Middleware to verify the JWT token
 const authenticateUser = (req, res, next) => {
-  const token = req.headers.authorization;
+  const  token = req.headers.authorization;
+  const token_without_bear =token.slice(7);
+
+
+
+  console.log(token)
   if (!token) {
     return res.status(401).json({ message: 'Authorization token not provided' });
   }
 
-  jwt.verify(token, 'your-secret-key', (err, decoded) => {
-   
+  jwt.verify(token_without_bear, 'your-secret-key', (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    else{
+    }
 
     req.user = decoded; // Set the decoded user information in the request object
     next();
