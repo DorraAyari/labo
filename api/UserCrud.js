@@ -8,16 +8,16 @@ const jwt = require('jsonwebtoken');
 // Middleware to verify the JWT token
 const authenticateUser = (req, res, next) => {
   const  token = req.headers.authorization;
-  const token_without_bear =token.slice(7);
+  //const token_without_bear =token.slice(7);
 
 
 
-  console.log(token)
+  
   if (!token) {
     return res.status(401).json({ message: 'Authorization token not provided' });
   }
 
-  jwt.verify(token_without_bear, 'your-secret-key', (err, decoded) => {
+  jwt.verify(token, 'your-secret-key', (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Invalid token' });
     }
@@ -55,6 +55,17 @@ router.post('/', authenticateUser, async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+router.get('/verifrequete', authenticateUser, async (req, res) => {
+  try {
+    
+
+    res.status(201).json({ message: "veriif" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 
 router.get('/:id', authenticateUser, async (req, res) => {
   try {
