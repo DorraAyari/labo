@@ -7,9 +7,13 @@ const materielRouter = require("./api/Materiel");
 const reservationRouter = require("./api/Reservation");
 const calendrierRouter = require("./api/Calendrier");
 
+const cors = require('cors');
+
+
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use("/", userRouter); 
 app.use("/user", userCrud);
 app.use("/reservation", reservationRouter);
@@ -25,7 +29,7 @@ app.get("/", (req, res) => {
 const connectToDatabase = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://labo:root@cluster0.pqbr7eg.mongodb.net/Node=API?retryWrites=true&w=majority"
+      "mongodb+srv://rayen:rayen@cluster0.qjsmetb.mongodb.net/?retryWrites=true&w=majority"
     );
     console.log("Connected to the database");
   } catch (error) {
