@@ -3,6 +3,7 @@ const router = express.Router();
 const Reservation = require('./../models/reservationModel');
 const Material = require('./../models/materielModel');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer'); 
 
 const authenticateUser = (req, res, next) => {
   const token = req.headers.authorization;
@@ -85,6 +86,8 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ... other code ...
+
 router.put('/:reservationId', async (req, res) => {
   try {
     const { reservationId } = req.params;
@@ -114,12 +117,37 @@ router.put('/:reservationId', async (req, res) => {
     await reservation.save();
 
     // Send an email to the user regarding the reservation status
-    // Code to send an email goes here...
-
-    res.json({ reservation });
+        const  transporter = nodemailer.createTransport({
+          host: "sandbox.smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: "fd50e9e045b5e0",
+            pass: "0cb81a727eab0c"
+          }
+        });
+        
+        const mailOptions = {
+          from: 'dorra.ayari@esprit.tn',
+          to: 'dorra.ayari@esprit.tn',
+          subject: 'Reservation Status',
+          text: `Your reservation with ID ${reservationId} has been ${reservation.status}.`,
+        };
+        
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error('Error sending email:', error);
+            return res.status(500).json({ message: 'Error sending email' });
+          } else {
+            console.log('Email sent:', info.response);
+            // No response needed here, as the response has already been sent before this callback.
+          }
+        });
+        
+  
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 module.exports = router;
