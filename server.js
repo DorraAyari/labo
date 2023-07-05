@@ -5,6 +5,7 @@ const userCrud = require("./api/UserCrud");
 const laboRouter = require("./api/Labo");
 const materielRouter = require("./api/Materiel");
 const reservationRouter = require("./api/Reservation");
+const calendrierRouter = require("./api/Calendrier");
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use("/user", userCrud);
 app.use("/reservation", reservationRouter);
 app.use("/labo", laboRouter);
 app.use("/materiel", materielRouter);
+app.use("/calendrier", calendrierRouter);
 app.get("/", (req, res) => {
   res.send("Hello Node API");
 });

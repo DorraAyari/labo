@@ -23,8 +23,14 @@ const reservationSchema = mongoose.Schema(
     endDateTime: {
       type: Date,
       required: true
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
     }
   },
+  
   {
     timestamps: true
   }

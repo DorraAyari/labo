@@ -44,6 +44,7 @@ router.post('/', authenticateUser, async (req, res) => {
       startDateTime: { $lt: endDate },
       endDateTime: { $gt: startDate },
       user: req.user.userId, // Assign the user ID from the authenticated user
+      status: 'pending', // Set the initial status as "pending"
     });
 
     if (existingReservation && material.quantityAvailable === 0) {
@@ -58,18 +59,66 @@ router.post('/', authenticateUser, async (req, res) => {
         startDateTime: startDate,
         endDateTime: endDate,
         user: req.user.userId, // Assign the user ID from the authenticated user
+        status: 'pending', // Set the initial status as "pending"
       });
+      res.status(201).json({ reservationId: reservation._id });
 
       // Update the quantityAvailable of the material
       material.quantityAvailable -= 1;
       await material.save();
-
-      res.status(201).json(reservation);
     } else {
-      res.status(409).json({ message: 'Material is not available for reservation' });
+      return res.status(409).json({ message: 'Material is not available for reservation' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/', async (req, res) => {
+  try {
+    // Fetch all reservations
+    const reservations = await Reservation.find();
+
+    res.json({ reservations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/:reservationId', async (req, res) => {
+  try {
+    const { reservationId } = req.params;
+    const { action } = req.body;
+
+    // Fetch the reservation to be approved/rejected
+    const reservation = await Reservation.findById(reservationId);
+    if (!reservation) {
+      return res.status(404).json({ message: 'Reservation not found' });
+    }
+
+    // Check if the reservation is already approved or rejected
+    if (reservation.status !== 'pending') {
+      return res.status(400).json({ message: 'Reservation already processed' });
+    }
+
+    // Update the reservation status based on the action
+    if (action === 'approve') {
+      reservation.status = 'approved';
+    } else if (action === 'reject') {
+      reservation.status = 'rejected';
+    } else {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+
+    // Save the updated reservation
+    await reservation.save();
+
+    // Send an email to the user regarding the reservation status
+    // Code to send an email goes here...
+
+    res.json({ reservation });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
