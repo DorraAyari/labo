@@ -2,13 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const userRouter = require("./api/User");
 const userCrud = require("./api/UserCrud");
-const laboRouter = require("./api/Labo");
-const materielRouter = require("./api/Materiel");
+const laboRouter = require("./api/Laboratoire");
+const materielRouter = require("./api/Equipement");
 const reservationRouter = require("./api/Reservation");
 const calendrierRouter = require("./api/Calendrier");
+const accesRouter = require("./api/AccesLabo");
 
 const cors = require('cors');
-
 
 const app = express();
 
@@ -17,9 +17,11 @@ app.use(cors());
 app.use("/", userRouter); 
 app.use("/user", userCrud);
 app.use("/reservation", reservationRouter);
-app.use("/labo", laboRouter);
-app.use("/materiel", materielRouter);
+app.use("/laboratoire", laboRouter);
+app.use("/equipement", materielRouter);
 app.use("/calendrier", calendrierRouter);
+app.use("/acces", accesRouter);
+
 app.get("/", (req, res) => {
   res.send("Hello Node API");
 });
