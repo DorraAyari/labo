@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Reservation = require('./../models/reservationModel');
-const Material = require('./../models/materielModel');
+const Material = require('../models/equipementModel');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer'); 
 
@@ -75,7 +75,7 @@ router.post('/', authenticateUser, async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+router.get('/',authenticateUser, async (req, res) => {
   try {
     // Fetch all reservations
     const reservations = await Reservation.find();
