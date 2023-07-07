@@ -21,11 +21,11 @@ const LaboratoireSchema = mongoose.Schema(
     },
     disponibilite: {
       type: Boolean,
-      required: true,
+    //  required: true,
     },
     etat: {
       type: String,
-      required: true,
+     // required: true,
     },
     image: {
       type: Array,
@@ -41,6 +41,40 @@ const LaboratoireSchema = mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+    events: [
+      {
+        _id: {
+          type: String,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        bloc: {
+          type: String,
+          required: true,
+        },
+        salle: {
+          type: String,
+          required: true,
+        },
+        startTime: {
+          type: Date,
+          required: true,
+        },
+        endTime: {
+          type: Date,
+          required: true,
+        },
+        status: {
+          type: String,
+          enum: ['pending', 'approved', 'rejected'],
+          default: 'pending',
+        },
+      },
+    ],
+  
   },
   {
     timestamps: true,
