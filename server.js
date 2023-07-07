@@ -7,6 +7,7 @@ const materielRouter = require("./api/Equipement");
 const reservationRouter = require("./api/Reservation");
 const calendrierRouter = require("./api/Calendrier");
 const accesRouter = require("./api/AccesLabo");
+const calendarRouter = require("./api/CalendarLab");
 
 const cors = require('cors');
 
@@ -21,6 +22,9 @@ app.use("/laboratoire", laboRouter);
 app.use("/equipement", materielRouter);
 app.use("/calendrier", calendrierRouter);
 app.use("/acces", accesRouter);
+app.use("/events", calendarRouter);
+
+
 
 app.get("/", (req, res) => {
   res.send("Hello Node API");
@@ -41,7 +45,7 @@ const connectToDatabase = async () => {
 
 connectToDatabase();
 
-app.listen(8000, () => {
+app.listen(8001, () => {
   console.log("Node API is running on port 8000");
 });
 
