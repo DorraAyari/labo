@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User = require('./../models/userModel');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const User = require("./../models/userModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // Helper function to generate a JWT token
 const generateToken = (user) => {
@@ -18,42 +18,41 @@ const generateToken = (user) => {
   };
 
   // Generate and return the token
-  return jwt.sign(payload, 'your-secret-key', options);
+  return jwt.sign(payload, "your-secret-key", options);
 };
 
-
-router.post('/signup', (req, res) => {
+router.post("/signup", (req, res) => {
   let { name, email, password, dateOfBirth } = req.body;
   name = name.trim();
   email = email.trim();
   password = password.trim();
   dateOfBirth = dateOfBirth.trim();
 
-  if (name === '' || email === '' || password === '' || dateOfBirth === '') {
+  if (name === "" || email === "" || password === "" || dateOfBirth === "") {
     return res.json({
-      status: 'FAILED',
-      message: 'Empty input fields',
+      status: "FAILED",
+      message: "Empty input fields",
     });
   }
 
   if (!/^[a-zA-Z]+$/.test(name)) {
     return res.json({
-      status: 'FAILED',
-      message: 'Invalid name entered',
+      status: "FAILED",
+      message: "Invalid name entered",
     });
   }
 
   if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
     return res.json({
-      status: 'FAILED',
-      message: 'Invalid email entered',
+      status: "FAILED",
+      message: "Invalid email entered",
     });
   }
 
   if (password.length < 8) {
     return res.json({
-      status: 'FAILED',
-      message: 'Invalid password entered',
+      status: "FAILED",
+      message: "Invalid password entered",
     });
   }
 
@@ -61,8 +60,8 @@ router.post('/signup', (req, res) => {
     .then((existingUser) => {
       if (existingUser) {
         return res.json({
-          status: 'FAILED',
-          message: 'User with the provided email already exists',
+          status: "FAILED",
+          message: "User with the provided email already exists",
         });
       }
 
@@ -74,65 +73,64 @@ router.post('/signup', (req, res) => {
             name,
             email,
             password: hashedPassword,
-            dateOfBirth
+            dateOfBirth,
           });
 
-          newUser.save()
-          .then((result) => {
-            const { _id, name, email, role } = result; // Extract the user ID from the saved result
-            const token = generateToken(result); // Generate token for the newly registered user
-            const userId = result.userId; // Access the user ID from the saved result
-        
-            res.json({
-              status: 'SUCCESS',
-              message: 'Signup successful',
-              data: {
-                user: {
-                  _id,
-                  name,
-                  userId, // Use the user ID as userId
-                  email,
-                  role,
+          newUser
+            .save()
+            .then((result) => {
+              const { _id, name, email, role } = result; // Extract the user ID from the saved result
+              const token = generateToken(result); // Generate token for the newly registered user
+              const userId = result.userId; // Access the user ID from the saved result
+
+              res.json({
+                status: "SUCCESS",
+                message: "Signup successful",
+                data: {
+                  user: {
+                    _id,
+                    name,
+                    userId, // Use the user ID as userId
+                    email,
+                    role,
+                  },
+                  token: token,
                 },
-                token: token,
-              },
+              });
+            })
+            .catch((err) => {
+              res.json({
+                status: "FAILED",
+                message: "An error occurred while saving user account",
+              });
             });
-          })
-          .catch((err) => {
-            res.json({
-              status: 'FAILED',
-              message: 'An error occurred while saving user account',
-            });
-          });
-        
         })
         .catch((err) => {
           res.json({
-            status: 'FAILED',
-            message: 'An error occurred while hashing the password',
+            status: "FAILED",
+            message: "An error occurred while hashing the password",
           });
         });
     })
     .catch((err) => {
       console.log(err);
       res.json({
-        status: 'FAILED',
-        message: 'An error occurred while checking for existing user',
+        status: "FAILED",
+        message: "An error occurred while checking for existing user",
       });
     });
 });
 
-router.post('/signin', (req, res) => {
-  
+router.post("/signin", (req, res) => {
   let { email, password } = req.body;
 
   email = email.trim();
   password = password.trim();
 
-  if (email === '' || password === '') {
+  if (email === "" || password === "") {
     return res.json({
-      status: 'FAILED',
-      message: 'Empty credentials supplied',
+      status: "FAILED",
+      message: "Empty credentials supplied",
     });
   }
 
@@ -140,8 +138,8 @@ router.post('/signin', (req, res) => {
     .then((user) => {
       if (!user) {
         return res.json({
-          status: 'FAILED',
-          message: 'Invalid credentials entered',
+          status: "FAILED",
+          message: "Invalid credentials entered",
         });
       }
       const token = generateToken(user); // Generate token for the authenticated user
@@ -153,8 +151,8 @@ router.post('/signin', (req, res) => {
           if (result) {
             const token = generateToken(user); // Generate token for the authenticated user
             res.json({
-              status: 'SUCCESS',
-              message: 'Signin successful',
+              status: "SUCCESS",
+              message: "Signin successful",
               data: {
                 user: user,
                 userId: user._id, // Use the user ID as userId
@@ -163,22 +161,22 @@ router.post('/signin', (req, res) => {
             });
           } else {
             res.json({
-              status: 'FAILED',
-              message: 'Invalid password entered',
+              status: "FAILED",
+              message: "Invalid password entered",
             });
           }
         })
         .catch((err) => {
           res.json({
-            status: 'FAILED',
-            message: 'An error occurred while comparing passwords',
+            status: "FAILED",
+            message: "An error occurred while comparing passwords",
           });
         });
     })
     .catch((err) => {
       res.json({
-        status: 'FAILED',
-        message: 'An error occurred while checking for existing user',
+        status: "FAILED",
+        message: "An error occurred while checking for existing user",
       });
     });
 });
