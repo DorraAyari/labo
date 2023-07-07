@@ -1,53 +1,52 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const LaboratoireSchema = mongoose.Schema(
   {
     labId: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     name: {
       type: String,
-      required: true
+      required: true,
     },
     bloc: {
       type: String,
-      required: true
+      required: true,
     },
     salle: {
       type: String,
-      required: true
+      required: true,
     },
     disponibilite: {
       type: Boolean,
-      required: true
-
+      required: true,
     },
     etat: {
       type: String,
-      required: true
-
+      required: true,
     },
     image: {
-      type: Array
+      type: Array,
     },
     responsable: {
       type: String,
-      required: true
+      // required: true,
+      ref: "User",
     },
 
-  status: {
-    type: String,
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending',
-  }
-},
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+  },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-const Laboratoire = mongoose.model('Laboratoire', LaboratoireSchema);
+const Laboratoire = mongoose.model("Laboratoire", LaboratoireSchema);
 
 module.exports = Laboratoire;

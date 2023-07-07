@@ -1,28 +1,27 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Equipement = require('../models/equipementModel');
-const mongoose = require('mongoose');
+const Equipement = require("../models/equipementModel");
+const mongoose = require("mongoose");
 
-const jwt = require('jsonwebtoken');
-
+const jwt = require("jsonwebtoken");
 
 // Middleware to verify the JWT token
 const authenticateUser = (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
-    return res.status(401).json({ message: 'Authorization token not provided' });
+    return res
+      .status(401)
+      .json({ message: "Authorization token not provided" });
   }
 
   // Verify the token
-  jwt.verify(token, 'your-secret-key', (err, decoded) => {
-   
-
+  jwt.verify(token, "your-secret-key", (err, decoded) => {
     req.user = decoded; // Set the decoded user information in the request object
     next();
   });
 };
 
-router.post('/',authenticateUser, async (req, res) => {
+router.post("/", authenticateUser, async (req, res) => {
   try {
     const {
       nom,
@@ -35,7 +34,7 @@ router.post('/',authenticateUser, async (req, res) => {
       dateCreation,
       dateDernierModif,
       quantityAvailable,
-      description
+      description,
     } = req.body;
     const equipement = await Equipement.create({
       nom,
@@ -48,7 +47,7 @@ router.post('/',authenticateUser, async (req, res) => {
       dateCreation,
       dateDernierModif,
       quantityAvailable,
-      description
+      description,
     });
     res.status(201).json(equipement);
   } catch (error) {
@@ -57,7 +56,7 @@ router.post('/',authenticateUser, async (req, res) => {
 });
 
 // READ - Get all equipements
-router.get('/',authenticateUser, async (req, res) => {
+router.get("/", authenticateUser, async (req, res) => {
   try {
     const equipements = await Equipement.find({});
     res.status(200).json(equipements);
@@ -67,15 +66,15 @@ router.get('/',authenticateUser, async (req, res) => {
 });
 
 // READ - Get a specific equipement
-router.get('/:id',authenticateUser, async (req, res) => {
+router.get("/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid equipement ID' });
+      return res.status(400).json({ message: "Invalid equipement ID" });
     }
     const equipement = await Equipement.findById(id);
     if (!equipement) {
-      return res.status(404).json({ message: 'Equipement not found' });
+      return res.status(404).json({ message: "Equipement not found" });
     }
     res.status(200).json(equipement);
   } catch (error) {
@@ -84,7 +83,7 @@ router.get('/:id',authenticateUser, async (req, res) => {
 });
 
 // UPDATE - Update an existing equipement
-router.put('/:id',authenticateUser, async (req, res) => {
+router.put("/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -98,10 +97,10 @@ router.put('/:id',authenticateUser, async (req, res) => {
       dateCreation,
       dateDernierModif,
       quantityAvailable,
-      description
+      description,
     } = req.body;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid equipement ID' });
+      return res.status(400).json({ message: "Invalid equipement ID" });
     }
     const equipement = await Equipement.findByIdAndUpdate(
       id,
@@ -116,12 +115,12 @@ router.put('/:id',authenticateUser, async (req, res) => {
         dateCreation,
         dateDernierModif,
         quantityAvailable,
-        description
+        description,
       },
       { new: true }
     );
     if (!equipement) {
-      return res.status(404).json({ message: 'Equipement not found' });
+      return res.status(404).json({ message: "Equipement not found" });
     }
     res.status(200).json(equipement);
   } catch (error) {
@@ -130,17 +129,17 @@ router.put('/:id',authenticateUser, async (req, res) => {
 });
 
 // DELETE - Delete an equipement
-router.delete('/:id',authenticateUser, async (req, res) => {
+router.delete("/:id", authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
-   if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid equipement ID' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid equipement ID" });
     }
     const equipement = await Equipement.findByIdAndDelete(id);
     if (!equipement) {
-      return res.status(404).json({ message: 'Equipement not found' });
+      return res.status(404).json({ message: "Equipement not found" });
     }
-    res.status(200).json({ message: 'Equipement deleted successfully' });
+    res.status(200).json({ message: "Equipement deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
