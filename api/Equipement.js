@@ -82,6 +82,24 @@ router.get("/:id", authenticateUser, async (req, res) => {
   }
 });
 
+
+router.get('/lab/:id',authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid equipement ID' });
+    }
+    const equipements = await Equipement.find({ labo: id });
+    console.log(equipements);
+    if (!equipements) {
+      return res.status(404).json({ message: 'Equipement not found' });
+    }
+    res.status(200).json(equipements);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // UPDATE - Update an existing equipement
 router.put("/:id", authenticateUser, async (req, res) => {
   try {
