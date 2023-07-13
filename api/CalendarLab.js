@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const authenticateUser = (req, res, next) => {
   const token = req.headers.authorization;
-  console.log("Token:", token); // Check the token value in the console
+  // console.log("Token:", token); // Check the token value in the console
 
   if (!token || !token.startsWith("Bearer ")) {
     return res
@@ -17,7 +17,7 @@ const authenticateUser = (req, res, next) => {
 
   const tokenValue = token.split(" ")[1]; // Extract the token value without the prefix
   jwt.verify(tokenValue, "your-secret-key", (err, decoded) => {
-    console.log("Decoded:", decoded); // Check the decoded object in the console
+    //console.log("Decoded:", decoded); // Check the decoded object in the console
 
     req.user = decoded; // Set the decoded user information in the request object
     next();
