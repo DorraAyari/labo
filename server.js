@@ -45,7 +45,7 @@ const connectToDatabase = async () => {
 
 connectToDatabase();
 
-app.listen(8001, () => {
+app.listen(8000, () => {
   console.log("Node API is running on port 8000");
 });
 
