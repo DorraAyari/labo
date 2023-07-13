@@ -38,6 +38,8 @@ router.post("/", authenticateUser, async (req, res) => {
       etat,
       image,
       status: "pending",
+      user: req.user.userId, // Assign the user ID from the authenticated user
+
     });
     res
       .status(201)
@@ -56,6 +58,22 @@ router.get("/", authenticateUser, async (req, res) => {
     const reservations = await Laboratoire.find();
 
     res.json({ reservations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get("/:reservationId", authenticateUser, async (req, res) => {
+  try {
+    const { reservationId } = req.params;
+
+    // Récupérer la réservation de laboratoire par son identifiant
+    const reservation = await Laboratoire.findById(reservationId);
+
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found" });
+    }
+
+    res.json({ reservation });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
