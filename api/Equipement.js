@@ -49,7 +49,7 @@ router.post("/", authenticateUser, async (req, res) => {
       quantityAvailable,
       description,
     });
-    res.status(201).json(equipement);
+    res.status(201).json({ message: "sucess" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
