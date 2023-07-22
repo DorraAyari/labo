@@ -45,7 +45,7 @@ router.post("/", authenticateUser, async (req, res) => {
       image,
       responsable,
     });
-    res.status(201).json(labo);
+    res.status(200).json({ message: "success" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
