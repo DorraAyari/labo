@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const Laboratoire = require('./../models/laboratoireModel');
+const nodemailer = require("nodemailer");
 
 const jwt = require("jsonwebtoken");
 
@@ -98,7 +99,7 @@ router.get('/',authenticateUser, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+////////////////////////////////////
 // Update the status of an event (approve or reject)
 // Update the status of an event (approve or reject)
 router.put('/:eventId',authenticateUser, async (req, res) => {
@@ -128,6 +129,38 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
     }
 
     await lab.save();
+
+    const transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "fd50e9e045b5e0",
+        pass: "0cb81a727eab0c",
+      },
+    });
+
+    const mailOptions = {
+      from: "dorra.ayari@esprit.tn",
+      to: "dorra.ayari@esprit.tn",
+      subject: "Reservation labo Status",
+      text: `Your reservation labo with ID ${event._id} has been ${event.status}.`,
+    };
+
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email" });
+      } else {
+
+        console.log("Email sent:", info.response);
+        // No response needed here, as the response has already been sent before this callback.
+      }
+    });
+  
+
+
 
     // Define color based on event status
     let color;

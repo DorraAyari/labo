@@ -17,6 +17,9 @@ const userSchema = mongoose.Schema(
     dateOfBirth: {
       type: Date,
       required: true,
+    },labid: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Laboratoire",
     },
     role: {
       type: String,

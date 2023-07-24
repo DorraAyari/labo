@@ -108,6 +108,49 @@ router.put("/:id", authenticateUser, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+///////////////////////////////////
+router.get("/findByResponsable/:responsableId",authenticateUser, async (req, res) => {
+  try {
+    const { responsableId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(responsableId)) {
+      return res.status(400).json({ message: "Invalid responsable ID" });
+    }
+const labos = await Labo.find({responsable:responsableId});
+
+
+    res.status(200).json(labos);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//Update responsable 
+router.put("/responsable/:id", authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { responsable } = req.body; // On extrait uniquement le champ "responsable" du corps de la requête
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid labo ID" });
+    }
+
+    const labo = await Labo.findByIdAndUpdate(
+      id,
+      { responsable }, // Mise à jour du champ "responsable" uniquement
+      { new: true }
+    );
+
+    if (!labo) {
+      return res.status(404).json({ message: "Labo not found" });
+    }
+
+    res.status(200).json(labo);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 // DELETE - Delete a labo
 router.delete("/:id", authenticateUser, async (req, res) => {

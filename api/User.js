@@ -22,11 +22,14 @@ const generateToken = (user) => {
 };
 
 router.post("/signup", (req, res) => {
-  let { name, email, password, dateOfBirth } = req.body;
+  let { name, email, password, dateOfBirth,role,labid } = req.body;
   name = name.trim();
   email = email.trim();
   password = password.trim();
   dateOfBirth = dateOfBirth.trim();
+  role = role.trim();
+
+  console.log(role);
 
   if (name === "" || email === "" || password === "" || dateOfBirth === "") {
     return res.json({
@@ -70,10 +73,12 @@ router.post("/signup", (req, res) => {
         .hash(password, saltRounds)
         .then((hashedPassword) => {
           const newUser = new User({
+            role,
             name,
             email,
             password: hashedPassword,
             dateOfBirth,
+            labid
           });
 
           newUser
