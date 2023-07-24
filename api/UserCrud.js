@@ -28,7 +28,7 @@ const authenticateUser = (req, res, next) => {
 router.get("/", authenticateUser, async (req, res) => {
   try {
    
-    const users = await User.find({});
+    const users = await User.find({role:"enseignant"});
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
