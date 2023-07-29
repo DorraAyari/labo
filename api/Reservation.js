@@ -84,7 +84,18 @@ router.post("/", authenticateUser, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+router.get("/material/:reservationId", authenticateUser, async (req, res) => {
+  try {
+    const { reservationId } = req.params;
 
+    // Fetch all reservations
+    const reservations = await Reservation.find({material:reservationId});
+
+    res.status(200).json({ reservations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 router.get("/", authenticateUser, async (req, res) => {
   try {
     // Fetch all reservations
@@ -109,11 +120,11 @@ router.put("/:reservationId", authenticateUser, async (req, res) => {
       return res.status(404).json({ message: "Reservation not found" });
     }
     // Vérifier si l'utilisateur connecté est le responsable de la réservation
-    if (req.user.role !== "responsable") {
+   /* if (req.user.role !== "responsable") {
       return res
         .status(403)
         .json({ message: "You are not authorized to perform this action" });
-    }
+    }*/
     // Check if the reservation is already approved or rejected
     if (reservation.status !== "pending") {
       return res.status(400).json({ message: "Reservation already processed" });
