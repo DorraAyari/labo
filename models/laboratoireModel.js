@@ -41,7 +41,7 @@ const LaboratoireSchema = mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    events: [
+ /*   events: [
       {
         _id: {
           type: String,
@@ -73,7 +73,7 @@ const LaboratoireSchema = mongoose.Schema(
           default: 'pending',
         },
       },
-    ],
+    ],*/
   
   },
   {
