@@ -2,34 +2,42 @@ const mongoose = require('mongoose');
 
 const calendrierSchema = mongoose.Schema(
   {
-    reservation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Reservation',
-      required: true
-    },
-    material: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Material',
-      required: true
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    startDateTime: {
-      type: Date,
-      required: true
-    },
-    endDateTime: {
-      type: Date,
-      required: true
-    }
-  },
-  {
-    timestamps: true
-  }
-);
+    _id: {
+          type: String,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        bloc: {
+          type: String,
+          required: true,
+        },
+        salle: {
+          type: String,
+          required: true,
+        },
+        startTime: {
+          type: Date,
+          required: true,
+        },
+        endTime: {
+          type: Date,
+          required: true,
+        },
+        status: {
+          type: String,
+          enum: ['pending', 'approved', 'rejected'],
+          default: 'pending',
+        } ,
+        labo: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Laboratoire',
+          required: true
+        }
+      }
+      );
 // ... Autres parties de votre modèle
 
 // Méthode statique pour récupérer tous les événements du calendrier

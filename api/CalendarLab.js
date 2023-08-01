@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const Laboratoire = require('./../models/laboratoireModel');
+const reservation = require('./../models/calendrierModel');
+
 const nodemailer = require("nodemailer");
 
 const jwt = require("jsonwebtoken");
@@ -28,24 +30,24 @@ const authenticateUser = (req, res, next) => {
 // Create an event
 router.post('/', authenticateUser,async (req, res) => {
   try {
-    const { labId, name, bloc, salle, startTime, endTime } = req.body;
-
+    const { labo, name, bloc, salle, startTime, endTime } = req.body;
+console.log("aaaaa",labo)
     // Check if the lab exists
-    const lab = await Laboratoire.findById(labId);
+   /* const lab = await Laboratoire.findById(labo);
     if (!lab) {
       return res.status(404).json({ message: 'Lab not found' });
-    }
+    }*/
 
     // Check if an event already exists for the given date
-    const existingEvent = lab.events.find((event) =>
+   /* const existingEvent = reservation.find((event) =>
       isSameDate(event.startTime, new Date(startTime))
     );
     if (existingEvent) {
       return res.status(409).json({ message: 'Event already exists for the given date' });
-    }
+    }*/
 
     // Initialize the events array if it's undefined
-    lab.events = lab.events || [];
+   // lab.events = lab.events || [];
 
     // Create the event
     const event = {
@@ -56,10 +58,35 @@ router.post('/', authenticateUser,async (req, res) => {
       startTime: new Date(startTime),
       endTime: new Date(endTime),
       status: 'pending',
+      labo,
     };
+    const send = await reservation.create(event);
+    res.status(200).json({ message: "success" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.get("/:id", authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+/*
+   if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid reservation ID" });
+    }*/
+    const reserv = await reservation.find({labo:id});
+
+    if (!reserv) {
+      return res.status(404).json({ message: "reserv not found" });
+    }
+    res.status(200).json(reserv);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
     // Add the event to the lab's events array
-    lab.events.push(event);
+  /*  lab.events.push(event);
     await lab.save();
 
     res.status(201).json({ event });
@@ -67,7 +94,7 @@ router.post('/', authenticateUser,async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+*/
 // Helper function to check if two dates have the same day, month, and year
 function isSameDate(date1, date2) {
   return (
@@ -85,18 +112,10 @@ function generateEventId() {
 // Get all events
 router.get('/',authenticateUser, async (req, res) => {
   try {
-    // Fetch all labs with events
-    const labs = await Laboratoire.find({ events: { $exists: true, $ne: [] } });
-
-    // Flatten the events array and return all events
-    const events = labs.reduce((accumulator, lab) => {
-      accumulator.push(...lab.events);
-      return accumulator;
-    }, []);
-
-    res.json({ events });
+    const reservations = await reservation.find();
+    res.status(200).json(reservations);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 ////////////////////////////////////
@@ -107,28 +126,29 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
     const { eventId } = req.params;
     const { action } = req.body;
 
-    // Find the lab containing the event
-    const lab = await Laboratoire.findOne({ 'events._id': eventId });
-    if (!lab) {
+    // Find the event containing the event
+    const reserv = await reservation.findById(eventId);
+
+    if (!reserv) {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    // Find the event and update its status
-    const event = lab.events.find((event) => event._id.toString() === eventId);
+    /*// Find the event and update its status
+    const event = reservation.find(() => _id.toString() === eventId);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
-    }
+    }*/
 
     // Update the reservation status based on the action
     if (action === 'approve' && event.status === 'pending') {
-      event.status = 'approved';
-    } else if (action === 'reject' && event.status === 'pending') {
-      event.status = 'rejected';
+      reserv.status = 'approved';
+    } else if (action === 'reject' && reserv.status === 'pending') {
+      reserv.status = 'rejected';
     } else {
       return res.status(400).json({ message: 'Invalid action or event has already been processed' });
     }
 
-    await lab.save();
+    await reserv.save();
 
     const transporter = nodemailer.createTransport({
       host: "sandbox.smtp.mailtrap.io",
@@ -143,7 +163,7 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
       from: "dorra.ayari@esprit.tn",
       to: "dorra.ayari@esprit.tn",
       subject: "Reservation labo Status",
-      text: `Your reservation labo with ID ${event._id} has been ${event.status}.`,
+      text: `Your reservation labo with ID ${reserv._id} has been ${reserv.status}.`,
     };
 
 
@@ -164,7 +184,7 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
 
     // Define color based on event status
     let color;
-    switch (event.status) {
+    switch (reserv.status) {
       case 'pending':
         color = 'yellow';
         break;
@@ -179,7 +199,7 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
         break;
     }
 
-    res.json({ event, color });
+    res.json({ reserv, color });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
