@@ -23,7 +23,8 @@ app.use("/equipement", materielRouter);
 app.use("/calendrier", calendrierRouter);
 app.use("/acces", accesRouter);
 app.use("/events", calendarRouter);
-
+const path = require("path");
+app.use("/assets", express.static(path.join(__dirname, "assets")));
 
 
 app.get("/", (req, res) => {

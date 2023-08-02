@@ -9,30 +9,31 @@ const LaboratoireSchema = mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
+     required: true,
     },
     bloc: {
       type: String,
-      required: true,
+     required: true,
     },
     salle: {
       type: String,
-      required: true,
+     required: true,
     },
     disponibilite: {
       type: Boolean,
-    //  required: true,
+     required: true,
     },
     etat: {
       type: String,
-     // required: true,
+     required: true,
     },
     image: {
-      type: Array,
+      type: [String], // An array of strings (filenames)
+      required: true, // The image field is required
     },
     responsable: {
       type: String,
-      // required: true,
+     required: true,
       ref: "User",
     },
 

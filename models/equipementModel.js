@@ -4,12 +4,12 @@ const equipementSchema = mongoose.Schema(
   {
     nom: {
       type: String,
-      required: true
+    //  required: true
     },
     ref: {
       type: String,
-      required: true,
-      unique: true
+    //  required: true
+    unique: true
     },
     image: {
       type: Array
@@ -17,8 +17,8 @@ const equipementSchema = mongoose.Schema(
     labo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Laboratoire',
-      required: true
-    },
+    //  required: true
+  },
     caracteristique: {
       type: Map,
       of: String
@@ -43,8 +43,8 @@ const equipementSchema = mongoose.Schema(
     },
     description: {
       type: String,
-      required: true
-    }
+    //  required: true
+  }
   },
   {
     timestamps: true
