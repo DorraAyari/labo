@@ -88,7 +88,7 @@ router.post("/", authenticateUser, upload.array("image"), async (req, res) => {
 });
 
 // UPDATE - Update an existing equipement with image upload
-router.put("/:id", authenticateUser, upload.single("image"), async (req, res) => {
+router.put("/:id", authenticateUser, upload.array("image"), async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -108,12 +108,23 @@ router.put("/:id", authenticateUser, upload.single("image"), async (req, res) =>
       return res.status(400).json({ message: "Invalid equipement ID" });
     }
 
+    const images = req.files; // Use upload.array() to get an array of uploaded files
+    console.log("Images:", images);
+
+    // Check if images are present and not null
+    if (!images || images.length === 0 || images.some((image) => !image)) {
+      console.log("No images uploaded");
+      return res.status(400).json({ message: "No valid image uploaded" });
+    }
+
+    console.log("Number of Uploaded Files:", images.length);
+
     const equipement = await Equipement.findByIdAndUpdate(
       id,
       {
         nom,
         ref,
-        image: req.file ? req.file.filename : undefined,
+        image: images.map((image) => image.filename),
         labo,
         caracteristique,
         marque,
