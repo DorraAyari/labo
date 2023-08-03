@@ -140,7 +140,7 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
     }*/
 
     // Update the reservation status based on the action
-    if (action === 'approve' && event.status === 'pending') {
+    if (action === 'approve' && reserv.status === 'pending') {
       reserv.status = 'approved';
     } else if (action === 'reject' && reserv.status === 'pending') {
       reserv.status = 'rejected';
