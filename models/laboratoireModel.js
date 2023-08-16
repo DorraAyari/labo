@@ -23,10 +23,7 @@ const LaboratoireSchema = mongoose.Schema(
       type: Boolean,
      required: true,
     },
-    etat: {
-      type: String,
-     required: true,
-    },
+    
     image: {
       type: [String], // An array of strings (filenames)
       required: true, // The image field is required

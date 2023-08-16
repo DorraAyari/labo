@@ -22,8 +22,10 @@ const generateToken = (user) => {
 };
 
 router.post("/signup", (req, res) => {
-  let { name, email, password, dateOfBirth,role,labid } = req.body;
+  let { name, email, password, dateOfBirth,role,labid,lastname } = req.body;
   name = name.trim();
+  lastname = lastname.trim();
+
   email = email.trim();
   password = password.trim();
   dateOfBirth = dateOfBirth.trim();
@@ -31,7 +33,7 @@ router.post("/signup", (req, res) => {
 
   console.log(role);
 
-  if (name === "" || email === "" || password === "" || dateOfBirth === "") {
+  if (name === "" || email === "" || password === "" || dateOfBirth === ""|| lastname === "") {
     return res.json({
       status: "FAILED",
       message: "Empty input fields",
@@ -39,6 +41,12 @@ router.post("/signup", (req, res) => {
   }
 
   if (!/^[a-zA-Z]+$/.test(name)) {
+    return res.json({
+      status: "FAILED",
+      message: "Invalid name entered",
+    });
+  }
+  if (!/^[a-zA-Z]+$/.test(lastname)) {
     return res.json({
       status: "FAILED",
       message: "Invalid name entered",
@@ -75,6 +83,8 @@ router.post("/signup", (req, res) => {
           const newUser = new User({
             role,
             name,
+            lastname,
+
             email,
             password: hashedPassword,
             dateOfBirth,
@@ -95,6 +105,7 @@ router.post("/signup", (req, res) => {
                   user: {
                     _id,
                     name,
+                    
                     userId, // Use the user ID as userId
                     email,
                     role,

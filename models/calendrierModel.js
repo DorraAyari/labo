@@ -31,6 +31,11 @@ const calendrierSchema = mongoose.Schema(
           enum: ['pending', 'approved', 'rejected'],
           default: 'pending',
         } ,
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
         labo: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Laboratoire',

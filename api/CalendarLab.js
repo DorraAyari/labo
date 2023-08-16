@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const Laboratoire = require('./../models/laboratoireModel');
+const User = require("../models/userModel");
+
 const reservation = require('./../models/calendrierModel');
 
 const nodemailer = require("nodemailer");
@@ -30,8 +32,7 @@ const authenticateUser = (req, res, next) => {
 // Create an event
 router.post('/', authenticateUser,async (req, res) => {
   try {
-    const { labo, name, bloc, salle, startTime, endTime } = req.body;
-console.log("aaaaa",labo)
+    const { labo, name, bloc, salle, startTime,user ,endTime } = req.body;
     // Check if the lab exists
    /* const lab = await Laboratoire.findById(labo);
     if (!lab) {
@@ -49,6 +50,9 @@ console.log("aaaaa",labo)
     // Initialize the events array if it's undefined
    // lab.events = lab.events || [];
 
+
+
+
     // Create the event
     const event = {
       _id: generateEventId(), // Generate a unique event ID
@@ -59,6 +63,7 @@ console.log("aaaaa",labo)
       endTime: new Date(endTime),
       status: 'pending',
       labo,
+      user
     };
     const send = await reservation.create(event);
     res.status(200).json({ message: "success" });
@@ -74,12 +79,53 @@ router.get("/:id", authenticateUser, async (req, res) => {
    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid reservation ID" });
     }*/
+
+
     const reserv = await reservation.find({labo:id});
+    
+    const Laborat = await Laboratoire.find({_id:id});
+const us = await User.find({_id:reserv.user});
 
     if (!reserv) {
       return res.status(404).json({ message: "reserv not found" });
     }
-    res.status(200).json(reserv);
+
+    // Suppose que 'reserv' est votre tableau d'objets
+
+const send = []; // Le nouveau tableau 'send'
+
+for (const item of reserv) {
+  console.log(item)
+  const iduser = item.user.toHexString();
+  const username = await User.findById(iduser);
+  console.log("username"+iduser);
+
+  console.log("username"+username.name);
+  const idlab = item.labo.toHexString();
+  const labname = await Laboratoire.findById(idlab);
+  console.log("labname"+labname.name);
+
+  const sendItem = {
+    _id: item._id,
+    name: item.name,
+    bloc: item.bloc,
+    user: username.email,
+    salle: item.salle,
+    startTime: item.startTime,
+    endTime: item.endTime,
+    status: item.status,
+    labo: labname.name
+  };
+ 
+  
+
+  send.push(sendItem); // Ajouter l'objet dans le tableau 'send'
+}
+
+// 'send' contient maintenant une copie de chaque objet dans 'reserv'
+
+    
+res.status(200).json(send);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -113,6 +159,7 @@ function generateEventId() {
 router.get('/',authenticateUser, async (req, res) => {
   try {
     const reservations = await reservation.find();
+
     res.status(200).json(reservations);
   } catch (error) {
     res.status(500).json({ message: error.message });

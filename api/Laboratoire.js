@@ -68,7 +68,6 @@ router.post("/", authenticateUser, upload.array("image"), async (req, res) => {
       bloc,
       salle,
       disponibilite,
-      etat,
       responsable,
     } = req.body;
 
@@ -79,7 +78,6 @@ router.post("/", authenticateUser, upload.array("image"), async (req, res) => {
       bloc,
       salle,
       disponibilite,
-      etat,
       responsable,
       image: images.map((image) => image.filename),
     });
@@ -129,7 +127,6 @@ router.put("/:id", authenticateUser, async (req, res) => {
       bloc,
       salle,
       disponibilite,
-      etat,
       image,
       responsable,
     } = req.body;
@@ -138,7 +135,7 @@ router.put("/:id", authenticateUser, async (req, res) => {
     }
     const labo = await Labo.findByIdAndUpdate(
       id,
-      { labId, name, bloc, salle, disponibilite, etat, image, responsable },
+      { labId, name, bloc, salle, disponibilite, image, responsable },
       { new: true }
     );
     if (!labo) {

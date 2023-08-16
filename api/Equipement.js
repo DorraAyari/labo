@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require('cors');
+const Laboratoire = require('./../models/laboratoireModel');
 
 const app = express();
 app.use(cors());
@@ -152,7 +153,34 @@ router.put("/:id", authenticateUser, upload.array("image"), async (req, res) => 
 router.get("/", authenticateUser, async (req, res) => {
   try {
     const equipements = await Equipement.find({});
-    res.status(200).json(equipements);
+
+    const send = []; // Le nouveau tableau 'send'
+console.log(equipements);
+    for (const item of equipements) {
+
+      const idlab = item.labo.toHexString();
+  const labname = await Laboratoire.findById(idlab).name;
+
+      
+      
+   
+      const sendItem = {
+       _id: item._id,
+        nom: item.nom,
+        ref: item.ref,
+        image: item.image,
+        labo: "aa",
+        marque: item.marque,
+        model: item.model,
+        quantityAvailable: item.quantityAvailable,
+        description: item.description
+ };
+
+
+
+      send.push(sendItem);
+    }
+    res.status(200).json(send );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -176,7 +204,7 @@ router.get("/:id", authenticateUser, async (req, res) => {
 });
 
 
-router.get('/lab/:id',authenticateUser, async (req, res) => {
+router.get('/lab/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
