@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../assets")); // Spécifiez le chemin absolu du dossier de destination des images
   },
   filename: (req, file, cb) => {
-    console.log(file);
+    //console.log(file);
     cb(null, Date.now() + path.extname(file.originalname)); // Générer un nom de fichier unique avec un horodatage
   },
 });
@@ -47,15 +47,15 @@ const upload = multer({
 router.post("/", authenticateUser, upload.array("image"), async (req, res) => {
   try {
     const images = req.files; // Use upload.array() to get an array of uploaded files
-    console.log("Images:", images);
+   // console.log("Images:", images);
 
     // Check if images are present and not null
     if (!images || images.length === 0 || images.some((image) => !image)) {
-      console.log("No images uploaded");
+   //   console.log("No images uploaded");
       return res.status(400).json({ message: "No valid image uploaded" });
     }
 
-    console.log("Number of Uploaded Files:", images.length);
+   // console.log("Number of Uploaded Files:", images.length);
     const {
       nom,
       ref,
@@ -110,15 +110,15 @@ router.put("/:id", authenticateUser, upload.array("image"), async (req, res) => 
     }
 
     const images = req.files; // Use upload.array() to get an array of uploaded files
-    console.log("Images:", images);
+    //console.log("Images:", images);
 
     // Check if images are present and not null
     if (!images || images.length === 0 || images.some((image) => !image)) {
-      console.log("No images uploaded");
+     // console.log("No images uploaded");
       return res.status(400).json({ message: "No valid image uploaded" });
     }
 
-    console.log("Number of Uploaded Files:", images.length);
+    //console.log("Number of Uploaded Files:", images.length);
 
     const equipement = await Equipement.findByIdAndUpdate(
       id,
@@ -153,23 +153,17 @@ router.put("/:id", authenticateUser, upload.array("image"), async (req, res) => 
 router.get("/", authenticateUser, async (req, res) => {
   try {
     const equipements = await Equipement.find({});
-
     const send = []; // Le nouveau tableau 'send'
-console.log(equipements);
     for (const item of equipements) {
 
-      const idlab = item.labo.toHexString();
-  const labname = await Laboratoire.findById(idlab).name;
-
-      
-      
-   
+      // const idlab = item.labo.toHexString();
+  const labname = await Laboratoire.findById(item.labo);
       const sendItem = {
        _id: item._id,
         nom: item.nom,
         ref: item.ref,
         image: item.image,
-        labo: "aa",
+        labo: labname.name,
         marque: item.marque,
         model: item.model,
         quantityAvailable: item.quantityAvailable,
@@ -182,7 +176,8 @@ console.log(equipements);
     }
     res.status(200).json(send );
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message });
   }
 });
 
@@ -211,7 +206,6 @@ router.get('/lab/:id', authenticateUser, async (req, res) => {
       return res.status(400).json({ message: 'Invalid equipement ID' });
     }
     const equipements = await Equipement.find({ labo: id });
-    console.log(equipements);
     if (!equipements) {
       return res.status(404).json({ message: 'Equipement not found' });
     }
@@ -220,6 +214,12 @@ router.get('/lab/:id', authenticateUser, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+
+
+
+
 
 // UPDATE - Update an existing equipement
 router.put("/:id", authenticateUser, async (req, res) => {

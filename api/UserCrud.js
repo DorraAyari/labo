@@ -35,9 +35,23 @@ router.get("/", authenticateUser, async (req, res) => {
   }
 });
 
+
+router.get("/etudiant", authenticateUser, async (req, res) => {
+  try {
+   
+    const users = await User.find({role:"etudiant"});
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 router.post("/", authenticateUser, async (req, res) => {
   try {
-    const { name, email, password, dateOfBirth } = req.body;
+    const { name, email, password, dateOfBirth,role,lastname } = req.body;
+
+    console.log(req.body)
     const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
     if (req.user.role !== "responsable") {
       return res
@@ -49,6 +63,7 @@ router.post("/", authenticateUser, async (req, res) => {
       email,
       password: hashedPassword,
       dateOfBirth,
+      role,lastname
     });
 
     res.status(201).json(user);

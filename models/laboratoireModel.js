@@ -28,10 +28,11 @@ const LaboratoireSchema = mongoose.Schema(
       type: [String], // An array of strings (filenames)
       required: true, // The image field is required
     },
+    
+
     responsable: {
-      type: String,
-     required: true,
-      ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
 
     status: {

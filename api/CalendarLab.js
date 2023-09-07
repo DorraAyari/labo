@@ -30,47 +30,43 @@ const authenticateUser = (req, res, next) => {
 };
 
 // Create an event
-router.post('/', authenticateUser,async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
-    const { labo, name, bloc, salle, startTime,user ,endTime } = req.body;
-    // Check if the lab exists
-   /* const lab = await Laboratoire.findById(labo);
-    if (!lab) {
-      return res.status(404).json({ message: 'Lab not found' });
-    }*/
+    const { labo, name, bloc, salle, startTime, user, endTime } = req.body;
 
-    // Check if an event already exists for the given date
-   /* const existingEvent = reservation.find((event) =>
-      isSameDate(event.startTime, new Date(startTime))
-    );
-    if (existingEvent) {
-      return res.status(409).json({ message: 'Event already exists for the given date' });
-    }*/
+    // Vérifiez si startTime est inférieur à endTime
+    if (new Date(startTime) >= new Date(endTime)) {
+      return res.status(400).json({ message: 'La startTime doit être antérieure à endTime' });
+    }
+    
+    // Ajoutez une heure à startTime et endTime
+    const startTimeWithHourAdded = new Date(startTime);
+    startTimeWithHourAdded.setHours(startTimeWithHourAdded.getHours() + 1);
+    
+    const endTimeWithHourAdded = new Date(endTime);
+    endTimeWithHourAdded.setHours(endTimeWithHourAdded.getHours() + 1);
 
-    // Initialize the events array if it's undefined
-   // lab.events = lab.events || [];
-
-
-
-
-    // Create the event
+    // Le reste de votre code pour la création de l'événement
     const event = {
-      _id: generateEventId(), // Generate a unique event ID
+      _id: generateEventId(), // Générez un ID d'événement unique
       name,
       bloc,
       salle,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
+      startTime: startTimeWithHourAdded,
+      endTime: endTimeWithHourAdded,
       status: 'pending',
       labo,
       user
     };
+    
     const send = await reservation.create(event);
     res.status(200).json({ message: "success" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
+
+
 
 router.get("/:id", authenticateUser, async (req, res) => {
   try {
@@ -97,12 +93,9 @@ const send = []; // Le nouveau tableau 'send'
 for (const item of reserv) {
   const iduser = item.user.toHexString();
   const username = await User.findById(iduser);
-  console.log("username"+iduser);
 
-  console.log("username"+username.name);
   const idlab = item.labo.toHexString();
   const labname = await Laboratoire.findById(idlab);
-  console.log("labname"+labname.name);
 
   const sendItem = {
     _id: item._id,
@@ -117,7 +110,6 @@ for (const item of reserv) {
   };
  
   
-console.log(sendItem)
   send.push(sendItem); // Ajouter l'objet dans le tableau 'send'
 }
 
@@ -129,6 +121,63 @@ res.status(200).json(send);
     res.status(500).json({ message: error.message });
   }
 });
+
+
+
+router.get("/user/:id", authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+/*
+   if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid reservation ID" });
+    }*/
+console.log(id);
+
+    const reserv = await reservation.find({user:id});
+    console.log(reserv);
+    const Laborat = await Laboratoire.find({_id:id});
+const us = await User.find({_id:reserv.user});
+
+    if (!reserv) {
+      return res.status(404).json({ message: "reserv not found" });
+    }
+
+    // Suppose que 'reserv' est votre tableau d'objets
+
+const send = []; // Le nouveau tableau 'send'
+
+for (const item of reserv) {
+  const iduser = item.user.toHexString();
+  const username = await User.findById(iduser);
+
+  
+  const labname = await Laboratoire.findById(item.labo);
+
+  const sendItem = {
+    _id: item._id,
+    name: item.name,
+    bloc: item.bloc,
+    user: username.email,
+    salle: item.salle,
+    startTime: item.startTime,
+    endTime: item.endTime,
+    status: item.status,
+    labo: labname.name
+  };
+ 
+  
+  send.push(sendItem); // Ajouter l'objet dans le tableau 'send'
+}
+
+// 'send' contient maintenant une copie de chaque objet dans 'reserv'
+
+    
+res.status(200).json(send);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
     // Add the event to the lab's events array
   /*  lab.events.push(event);
@@ -176,7 +225,6 @@ router.get("/", authenticateUser, async (req, res) => {
 
 
     const reserv = await reservation.find();
-    
 
     if (!reserv) {
       return res.status(404).json({ message: "reserv not found" });
@@ -189,13 +237,10 @@ const send = []; // Le nouveau tableau 'send'
 for (const item of reserv) {
   const iduser = item.user.toHexString();
   const username = await User.findById(iduser);
-  console.log("username"+iduser);
 
-  console.log("username"+username.name);
   const idlab = item.labo.toHexString();
   const labname = await Laboratoire.findById(idlab);
-  console.log("labname"+labname.name);
-
+  
   const sendItem = {
     _id: item._id,
     name: item.name,
@@ -209,8 +254,8 @@ for (const item of reserv) {
   };
  
   
-console.log(sendItem)
-  send.push(sendItem); // Ajouter l'objet dans le tableau 'send'
+ 
+    send.push(sendItem); // Ajouter l'objet dans le tableau 'send'
 }
 
 // 'send' contient maintenant une copie de chaque objet dans 'reserv'
@@ -221,6 +266,10 @@ res.status(200).json(send);
     res.status(500).json({ message: error.message });
   }
 });
+
+
+
+
 
 ////////////////////////////////////
 // Update the status of an event (approve or reject)
@@ -265,7 +314,7 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
 
     const mailOptions = {
       from: "dorra.ayari@esprit.tn",
-      to: "dorra.ayari@esprit.tn",
+      to: "dorra.ayari@esprit.tn", 
       subject: "Reservation labo Status",
       text: `Your reservation labo with ID ${reserv._id} has been ${reserv.status}.`,
     };

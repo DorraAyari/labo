@@ -22,7 +22,8 @@ const generateToken = (user) => {
 };
 
 router.post("/signup", (req, res) => {
-  let { name, email, password, dateOfBirth,role,labid,lastname } = req.body;
+  let { name, email, password, dateOfBirth,role,lastname } = req.body;
+  console.log(req.body);
   name = name.trim();
   lastname = lastname.trim();
 
@@ -88,7 +89,6 @@ router.post("/signup", (req, res) => {
             email,
             password: hashedPassword,
             dateOfBirth,
-            labid
           });
 
           newUser
