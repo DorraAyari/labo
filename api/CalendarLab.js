@@ -358,4 +358,88 @@ router.put('/:eventId',authenticateUser, async (req, res) => {
   }
 });
 
+
+router.put('/annuler/:eventId',authenticateUser, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { action } = req.body;
+
+    // Find the event containing the event
+    const reserv = await reservation.findById(eventId);
+
+    if (!reserv) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    /*// Find the event and update its status
+    const event = reservation.find(() => _id.toString() === eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }*/
+
+    // Update the reservation status based on the action
+    if (action === 'annuler' ) {
+      console.log("test");
+      reserv.status = 'pending';
+    }  else {
+      return res.status(400).json({ message: 'Invalid action or event has already been processed' });
+    }
+
+    await reserv.save();
+
+    const transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "fd50e9e045b5e0",
+        pass: "0cb81a727eab0c",
+      },
+    });
+
+    const mailOptions = {
+      from: "dorra.ayari@esprit.tn",
+      to: "dorra.ayari@esprit.tn", 
+      subject: "Reservation labo Status",
+      text: `Your reservation labo with ID ${reserv._id} has been ${reserv.status}.`,
+    };
+
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email" });
+      } else {
+
+        console.log("Email sent:", info.response);
+        // No response needed here, as the response has already been sent before this callback.
+      }
+    });
+  
+
+
+
+    // Define color based on event status
+    let color;
+    switch (reserv.status) {
+      case 'pending':
+        color = 'yellow';
+        break;
+      case 'approved':
+        color = 'green';
+        break;
+      case 'rejected':
+        color = 'red';
+        break;
+      default:
+        color = 'gray';
+        break;
+    }
+
+    res.json({ reserv, color });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

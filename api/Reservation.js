@@ -161,7 +161,7 @@ console.log(material)
 
 const sendItem ={
   _id: item._id,
-  reservationId: item.reservationId,
+  reservationId: material.nom,
   user: username.email,
   material: material.image,
   startDateTime: item.startDateTime,
