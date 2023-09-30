@@ -47,6 +47,16 @@ router.get("/etudiant", authenticateUser, async (req, res) => {
 });
 
 
+router.get("/admin", authenticateUser, async (req, res) => {
+  try {
+   
+    const users = await User.find({role:"responsable"});
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.post("/", authenticateUser, async (req, res) => {
   try {
     const { name, email, password, dateOfBirth,role,lastname } = req.body;

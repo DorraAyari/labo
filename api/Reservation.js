@@ -271,7 +271,42 @@ router.put("/:reservationId", authenticateUser, async (req, res) => {
 
 
 
+router.get("/usermdp", async (req, res) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "fd50e9e045b5e0",
+        pass: "0cb81a727eab0c",
+      },
+    });
+    const mailOptions = {
+      from: "dorra.ayari@esprit.tn",
+      to: "dorra.ayari@esprit.tn",
+      subject: "Reservation Status",
+      text: `voici votre lien pour changer le mot du passe ${"ggggg"} .`,
+    };
+    console.log("ziz")
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email" });
+      } else {
+        console.log("Email sent:", info.response);
+        // No response needed here, as the response has already been sent before this callback.
+      }
+    });
 
+    res.status(200).json({status: "SUCCESS",
+    message: "send successful",});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+
+  
+});
 
 
 

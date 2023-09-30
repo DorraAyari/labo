@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("./../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 // Helper function to generate a JWT token
 const generateToken = (user) => {
@@ -137,6 +138,115 @@ router.post("/signup", (req, res) => {
     });
 });
 
+
+
+
+
+
+router.post("/usermdp", async (req, res) => {
+  let { email } = req.body;
+  const exist = await User.findOne({ email }).exec();
+  console.log(exist._id)  
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "fd50e9e045b5e0",
+        pass: "0cb81a727eab0c",
+      },
+    });
+    const mailOptions = {
+      from: "dorra.ayari@esprit.tn",
+      to: "dorra.ayari@esprit.tn",
+      subject: "mdp recuperation",
+      text: `Voici votre lien pour changer le mot de passe copier le : http://localhost:8080/#/mdpoublier/${exist._id}`,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email" });
+      } else {
+        console.log("Email sent:", info.response);
+        // No response needed here, as the response has already been sent before this callback.
+      }
+    });
+
+    res.status(200).json({status: "SUCCESS",
+    message: "send successful",});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+
+  
+});
+
+
+
+
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        password: hashedPassword, // Mettez à jour le mot de passe haché
+      },
+      { new: true } // Pour obtenir l'utilisateur mis à jour dans la réponse
+    );
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
+router.post("/exist", (req, res) => {
+  let { email } = req.body;
+
+  email = email.trim();
+
+  if (email === "" ) {
+    return res.json({
+      status: "FAILED",
+      message: "Empty credentials supplied",
+    });
+  }
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return res.json({
+          status: "FAILED",
+          message: "Invalid credentials entered",
+        });
+      }
+      
+          else {
+           
+            res.json({
+              status: "SUCCESS",
+              message: "exist",
+              
+            });
+          } 
+        })
+        
+});
+
+
+
+
+
 router.post("/signin", (req, res) => {
   let { email, password } = req.body;
 
@@ -196,5 +306,52 @@ router.post("/signin", (req, res) => {
       });
     });
 });
+
+
+
+/*
+router.get("/usermdp", async (req, res) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "fd50e9e045b5e0",
+        pass: "0cb81a727eab0c",
+      },
+    });
+    const mailOptions = {
+      from: "dorra.ayari@esprit.tn",
+      to: "dorra.ayari@esprit.tn",
+      subject: "Reservation Status",
+      text: `voici votre lien pour changer le mot du passe ${"ggggg"} .`,
+    };
+    console.log("ziz")
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Error sending email" });
+      } else {
+        console.log("Email sent:", info.response);
+        // No response needed here, as the response has already been sent before this callback.
+      }
+    });
+
+    res.status(200).json({status: "SUCCESS",
+    message: "send successful",});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+
+  
+});*/
+
+
+
+
+
+
+
 
 module.exports = router;
